@@ -14,6 +14,8 @@ REGION="us-east-1"
 ACCOUNT_ID="746669194590"
 GITHUB_ORG="zevlo"
 GITHUB_REPO="qr-platform"
+GITHUB_OWNER_ID="104938351"
+GITHUB_REPO_ID="1307854556"
 ROLE_NAME="qr-platform-gha"
 OIDC_URL="https://token.actions.githubusercontent.com"
 # AWS manages the actual thumbprint list; the sentinel below tells IAM to use it.
@@ -114,7 +116,10 @@ TRUST_POLICY=$(cat <<JSON
           "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
         },
         "StringLike": {
-          "token.actions.githubusercontent.com:sub": "repo:${GITHUB_ORG}/${GITHUB_REPO}:*"
+          "token.actions.githubusercontent.com:sub": [
+            "repo:${GITHUB_ORG}/${GITHUB_REPO}:*",
+            "repo:${GITHUB_ORG}@${GITHUB_OWNER_ID}/${GITHUB_REPO}@${GITHUB_REPO_ID}:*"
+          ]
         }
       }
     }

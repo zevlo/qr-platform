@@ -29,8 +29,10 @@ No `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` secrets should ever be set on t
 | ECR repo | `qr-frontend` | Frontend image registry, scan-on-push |
 | ECR lifecycle policy | both repos | Untagged expire after 1d; keep last 10 tagged |
 | OIDC IdP | `token.actions.githubusercontent.com` | Lets GitHub Actions mint AWS tokens |
-| IAM role | `qr-platform-gha` | Trusts `repo:zevlo/qr-platform:*` |
+| IAM role | `qr-platform-gha` | Trusts both `sub` formats from `repo:zevlo/qr-platform` |
 | Inline policy | `ecr-push` on the role | Push permissions scoped to the two repos |
+
+> **OIDC `sub` quirk:** This repo's Actions tokens use GitHub's v2 ID-format subject claim (`repo:zevlo@104938351/qr-platform@1307854556:ref:...`) rather than the textbook name format. The role trust policy accepts **both** formats so the trust still works if GitHub flips the default back.
 
 ## Phase 3 handoff — `terraform import` addresses
 
