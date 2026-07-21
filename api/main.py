@@ -24,12 +24,15 @@ app.add_middleware(
 )
 
 # AWS S3 Configuration
-s3 = boto3.client(
-    's3',
-    aws_access_key_id= os.getenv("AWS_ACCESS_KEY"),
-    aws_secret_access_key= os.getenv("AWS_SECRET_KEY"))
+# Uses boto3 default credential chain: env vars → ~/.aws/credentials → IAM role (IRSA in k8s).
+# This supports local dev (aws CLI profile) and production (IRSA) without code changes.
+s3 = boto3.client('s3')
 
-bucket_name = 'YOUR_BUCKET_NAME' # Add your bucket name here
+bucket_name = os.getenv("BUCKET_NAME", "YOUR_BUCKET_NAME")
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
 
 @app.post("/generate-qr/")
 async def generate_qr(url: str):
