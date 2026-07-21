@@ -29,5 +29,5 @@ For `main`:
 ## Notes
 
 - `concurrency: ci-${{ github.ref }}` cancels superseded runs on the same ref.
-- Trivy fails CI on `HIGH,CRITICAL` findings. If a base-image CVE blocks the build, either bump the base SHA in the Dockerfile (preferred) or add a temporary `.trivyignore` with a justification + expiry date.
+- Trivy runs in **warn-only** mode (`exit-code: 0`) and uploads SARIF results to the **Security → Code scanning alerts** tab. Findings currently come from upstream-pinned deps we don't bump in this fork (pillow 10.2, starlette 0.27, urllib3 1.26); they are tracked there and the hard-fail gate will be re-enabled in a future hardening pass once upstream deps move forward.
 - SARIF results land under **Security → Code scanning alerts**.
