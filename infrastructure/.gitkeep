@@ -1,0 +1,13 @@
+# Phase 3 — Terraform infrastructure
+
+Remote state: S3 + DynamoDB lock (to be created manually first, then referenced)
+
+Planned modules:
+- `modules/vpc/` — 2 AZ, public + private subnets
+- `modules/eks/` — cluster + managed node group (2x t3.medium)
+- `modules/ecr/` — `qr-api`, `qr-frontend` repos
+- `modules/s3/` — QR code bucket (private, versioned, 30-day lifecycle)
+- `modules/iam/` — IRSA roles for api, External Secrets, ArgoCD, cert-manager
+- `modules/secrets-manager/` — runtime AWS keys for api pod
+
+Cost discipline: `terraform destroy` whenever not actively demoing.

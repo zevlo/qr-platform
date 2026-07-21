@@ -1,0 +1,65 @@
+# Environment
+.env
+.env.*
+!.env.example
+api/.env
+front-end-nextjs/.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+.next/
+out/
+.npm/
+.pnp.*
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+*.tfvars
+!*.tfvars.example
+crash.log
+crash.*.log
+
+# Kubernetes
+kubeconfig*
+*.kube
+.kube/
+
+# AWS
+.aws/
+*.pem
+*.key
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Build output
+dist/
+build/

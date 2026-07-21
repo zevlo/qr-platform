@@ -1,0 +1,11 @@
+# Phase 4 — Kubernetes manifests
+
+Namespace: `qr-app` (proposed)
+
+Will contain:
+- `namespace.yaml`
+- `api.yaml` (Deployment, Service, Secret/ExternalSecret, PDB)
+- `frontend.yaml` (Deployment, Service, ConfigMap)
+- `ingress.yaml` (NGINX Ingress, TLS via cert-manager)
+
+Validate locally with: `kubectl apply --dry-run=client -f k8s/`
