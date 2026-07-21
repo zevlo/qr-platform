@@ -1,17 +1,27 @@
+from unittest.mock import patch
+
 from fastapi.testclient import TestClient
+
 from main import app
 
 client = TestClient(app)
 
-def test_generate_qr():
-    url = "http://example.com"
-    response = client.post("/generate-qr/", json={"url": url})
 
+def test_health():
+    response = client.get("/health")
     assert response.status_code == 200
-    assert "qr_code_url" in response.json()
+    assert response.json() == {"status": "ok"}
 
-def test_generate_qr_invalid_url():
-    url = "invalid-url"
-    response = client.post("/generate-qr/", json={"url": url})
 
-    assert response.status_code == 422  # FastAPI validation error
+def test_generate_qr():
+    with patch("main.s3") as mock_s3:
+        mock_s3.put_object.return_value = {}
+        response = client.post("/generate-qr/?url=http://example.com")
+        assert response.status_code == 200
+        assert "qr_code_url" in response.json()
+        mock_s3.put_object.assert_called_once()
+
+
+def test_generate_qr_missing_url():
+    response = client.post("/generate-qr/")
+    assert response.status_code == 422

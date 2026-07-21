@@ -1,12 +1,13 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-import qrcode
-import boto3
 import os
 from io import BytesIO
 
-# Loading Environment variable (AWS Access Key and Secret Key)
+import boto3
+import qrcode
 from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+
+# Loading Environment variable (AWS Access Key and Secret Key)
 load_dotenv()
 
 app = FastAPI()
@@ -64,5 +65,5 @@ async def generate_qr(url: str):
         s3_url = f"https://{bucket_name}.s3.amazonaws.com/{file_name}"
         return {"qr_code_url": s3_url}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
     
