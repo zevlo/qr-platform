@@ -189,7 +189,7 @@ qr-platform/
 
 ### Cost
 
-- **Up (~5 hours during P3 dev):** EKS control plane + 2× t3.medium + 3× interface endpoints + secrets manager ≈ $1.50 total
+- **Up (~50 minutes during P3 dev):** EKS control plane + 2× t3.medium + 3× interface endpoints + secrets manager ≈ **$0.25 total**. Verified via CloudTrail: cluster created at `2026-07-21T20:02:14Z`, `DeleteCluster` at `2026-07-21T20:49:30Z`.
 - **Down (current state):** state bucket + lock table + QR bucket + ECR repos = <$1/mo
 
 ### Handoff to Phase 4
