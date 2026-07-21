@@ -1,0 +1,32 @@
+services:
+  api:
+    build:
+      context: ./api
+    container_name: qr-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./api/.env
+    volumes:
+      - ~/.aws:/home/appuser/.aws:ro
+    networks:
+      - app-net
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./front-end-nextjs
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+    container_name: qr-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    networks:
+      - app-net
+    restart: unless-stopped
+
+networks:
+  app-net:
+    driver: bridge

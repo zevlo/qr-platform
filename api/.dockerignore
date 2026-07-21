@@ -1,0 +1,28 @@
+# Python
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+
+# Tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Secret
+.env
+.env.local
+.env.*.local
+
+# Version control / OS
+.git/
+.gitignore
+.DS_Store
+
+# Tests
+test_main.py

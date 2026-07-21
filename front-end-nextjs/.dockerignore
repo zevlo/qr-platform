@@ -1,0 +1,27 @@
+# Node
+node_modules/
+.npm/
+.pnp.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Next.js build output
+.next/
+out/
+build/
+
+# Secrets
+.env
+.env.local
+.env.*.local
+
+# Version control / OS / editors
+.git/
+.gitignore
+.DS_Store
+.vscode/
+.idea/
+
+# Tests / coverage
+coverage/

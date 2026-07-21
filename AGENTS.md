@@ -56,8 +56,8 @@ Living status: [`PREFLIGHT.md`](./PREFLIGHT.md)
 
 | Phase | Status | Branch |
 |---|---|---|
-| 0 — Fork + local verify | in progress (manual steps pending in PREFLIGHT.md) | `main` |
-| 1 — Containerization | not started | `feat/containerization` |
+| 0 — Fork + local verify | ✅ done (commit 84dff4e) | `main` |
+| 1 — Containerization | ✅ done (this branch) | `feat/containerization` |
 | 2 — CI/CD | not started | `feat/cicd` |
 | 3 — Terraform | not started | `feat/terraform` |
 | 4 — Kubernetes | not started | `feat/k8s` |
