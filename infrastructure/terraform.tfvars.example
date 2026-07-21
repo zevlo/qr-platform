@@ -1,0 +1,12 @@
+# Copy to terraform.tfvars and edit. terraform.tfvars is gitignored.
+
+# Defaults are usually fine for the portfolio demo.
+
+# cluster_version   = "1.31"
+# node_instance_type = "t3.medium"
+# node_count        = 2        # set to 1 for short demos
+
+# Override these if you fork the repo:
+# qr_bucket_name     = "zevlo-qr-platform-codes"
+# tfstate_bucket_name = "zevlo-qr-platform-tfstate"
+# tfstate_ddb_table  = "terraform-locks"

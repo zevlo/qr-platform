@@ -31,6 +31,8 @@ No `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` secrets should ever be set on t
 | OIDC IdP | `token.actions.githubusercontent.com` | Lets GitHub Actions mint AWS tokens |
 | IAM role | `qr-platform-gha` | Trusts both `sub` formats from `repo:zevlo/qr-platform` |
 | Inline policy | `ecr-push` on the role | Push permissions scoped to the two repos |
+| S3 bucket | `zevlo-qr-platform-tfstate` | Terraform state (versioned, SSE, public-blocked, 90d noncurrent lifecycle) |
+| DynamoDB table | `terraform-locks` | State locking (PAY_PER_REQUEST) |
 
 > **OIDC `sub` quirk:** This repo's Actions tokens use GitHub's v2 ID-format subject claim (`repo:zevlo@104938351/qr-platform@1307854556:ref:...`) rather than the textbook name format. The role trust policy accepts **both** formats so the trust still works if GitHub flips the default back.
 
@@ -39,10 +41,13 @@ No `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` secrets should ever be set on t
 When the ECR and IAM modules land in Phase 3, import (don't recreate) these resources so Terraform adopts them without state drift:
 
 ```
-terraform import module.ecr.aws_ecr_repository.api    746669194590.dkr.ecr.us-east-1.amazonaws.com/qr-api
-terraform import module.ecr.aws_ecr_repository.frontend 746669194590.dkr.ecr.us-east-1.amazonaws.com/qr-frontend
-terraform import module.iam.aws_iam_role.gha          qr-platform-gha
-terraform import module.iam.aws_iam_openid_connect_provider.github arn:aws:iam::746669194590:oidc-provider/token.actions.githubusercontent.com
+terraform import module.s3.aws_s3_bucket.qr_codes                  zevlo-qr-platform-codes
+terraform import module.ecr.aws_ecr_repository.this["qr-api"]      qr-api
+terraform import module.ecr.aws_ecr_repository.this["qr-frontend"] qr-frontend
+terraform import module.iam_bootstrap.aws_iam_role.gha             qr-platform-gha
+terraform import module.iam_bootstrap.aws_iam_openid_connect_provider.github arn:aws:iam::746669194590:oidc-provider/token.actions.githubusercontent.com
+terraform import module.tfstate.aws_s3_bucket.this                 zevlo-qr-platform-tfstate
+terraform import module.tfstate.aws_dynamodb_table.locks           terraform-locks
 ```
 
 ## Tear down

@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
-# Bootstrap AWS resources for qr-platform Phase 2 CI/CD.
+# Bootstrap AWS resources for qr-platform.
+#   - Phase 2: ECR + OIDC + IAM role for GitHub Actions
+#   - Phase 3: Terraform state backend (S3 + DynamoDB lock table)
+#
 # Run once from a laptop authenticated as an admin (e.g. `admin-zach`).
-# Idempotent-ish: each step guards on the resource already existing.
+# Idempotent: each step guards on the resource already existing.
 #
 #   AWS_PROFILE=admin-zach ./bootstrap/aws.sh
 #
@@ -20,6 +23,9 @@ ROLE_NAME="qr-platform-gha"
 OIDC_URL="https://token.actions.githubusercontent.com"
 # AWS manages the actual thumbprint list; the sentinel below tells IAM to use it.
 OIDC_THUMBPRINT="0000000000000000000000000000000000000000"
+
+TFSTATE_BUCKET="zevlo-qr-platform-tfstate"
+TFSTATE_DDB_TABLE="terraform-locks"
 
 REPOS=("qr-api" "qr-frontend")
 
@@ -188,7 +194,56 @@ echo "    inline policy applied"
 echo
 
 # ------------------------------------------------------------
-# 4. Output
+# 4. Terraform state backend (S3 + DynamoDB lock)
+# ------------------------------------------------------------
+echo "==> Terraform state bucket: ${TFSTATE_BUCKET}"
+if aws s3api head-bucket --bucket "${TFSTATE_BUCKET}" >/dev/null 2>&1; then
+  echo "    already exists"
+else
+  aws s3api create-bucket \
+    --region "${REGION}" \
+    --bucket "${TFSTATE_BUCKET}" \
+    >/dev/null
+  aws s3api put-bucket-versioning \
+    --bucket "${TFSTATE_BUCKET}" \
+    --versioning-configuration Status=Enabled \
+    >/dev/null
+  aws s3api put-bucket-encryption \
+    --bucket "${TFSTATE_BUCKET}" \
+    --server-side-encryption-configuration \
+      '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}' \
+    >/dev/null
+  aws s3api put-public-access-block \
+    --bucket "${TFSTATE_BUCKET}" \
+    --public-access-block-configuration \
+      '{"BlockPublicAcls":true,"IgnorePublicAcls":true,"BlockPublicPolicy":true,"RestrictPublicBuckets":true}' \
+    >/dev/null
+  aws s3api put-bucket-lifecycle-configuration \
+    --bucket "${TFSTATE_BUCKET}" \
+    --lifecycle-configuration \
+      '{"Rules":[{"ID":"expire-noncurrent","Status":"Enabled","Filter":{},"NoncurrentVersionExpiration":{"NoncurrentDays":90}}]}' \
+    >/dev/null
+  echo "    created (versioning + SSE + block public + 90d noncurrent expire)"
+fi
+echo
+
+echo "==> Terraform lock table: ${TFSTATE_DDB_TABLE}"
+if aws dynamodb describe-table --table-name "${TFSTATE_DDB_TABLE}" >/dev/null 2>&1; then
+  echo "    already exists"
+else
+  aws dynamodb create-table \
+    --region "${REGION}" \
+    --table-name "${TFSTATE_DDB_TABLE}" \
+    --attribute-definitions AttributeName=LockID,AttributeType=S \
+    --key-schema AttributeName=LockID,KeyType=HASH \
+    --billing-mode PAY_PER_REQUEST \
+    >/dev/null
+  echo "    created"
+fi
+echo
+
+# ------------------------------------------------------------
+# 5. Output
 # ------------------------------------------------------------
 cat <<EOF
 
@@ -203,9 +258,12 @@ cat <<EOF
   Phase 3 (Terraform) will adopt these resources via import:
 =================================================================
 
-  terraform import module.ecr.aws_ecr_repository.api    ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/qr-api
-  terraform import module.ecr.aws_ecr_repository.frontend ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/qr-frontend
-  terraform import module.iam.aws_iam_role.gha          ${ROLE_NAME}
+  terraform import module.s3.aws_s3_bucket.qr_codes                  zevlo-qr-platform-codes
+  terraform import module.ecr.aws_ecr_repository.api                 ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/qr-api
+  terraform import module.ecr.aws_ecr_repository.frontend            ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/qr-frontend
+  terraform import module.iam.aws_iam_role.gha                       ${ROLE_NAME}
   terraform import module.iam.aws_iam_openid_connect_provider.github ${OIDC_ARN}
+  terraform import module.tfstate.aws_s3_bucket.this                 ${TFSTATE_BUCKET}
+  terraform import module.tfstate.aws_dynamodb_table.locks           ${TFSTATE_DDB_TABLE}
 
 EOF
