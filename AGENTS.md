@@ -33,7 +33,7 @@ Living status: [`PREFLIGHT.md`](./PREFLIGHT.md)
 
 - `feat/containerization` — Phase 1 (Dockerfiles, docker-compose)
 - `feat/cicd` — Phase 2 (GitHub Actions, ECR push, trivy scan) ✅ merged via PR #1
-- `feat/terraform` — Phase 3 (AWS infra modules)
+- `feat/terraform` — Phase 3 (AWS infra modules) ✅ merged via PR #2
 - `feat/k8s` — Phase 4 (manifests, ingress, TLS)
 - `feat/observability` — Phase 5 (ArgoCD, Prometheus, dashboards, alerts)
 
@@ -59,7 +59,7 @@ Living status: [`PREFLIGHT.md`](./PREFLIGHT.md)
 | 0 — Fork + local verify | ✅ done (commit 84dff4e) | `main` |
 | 1 — Containerization | ✅ done (this branch) | `feat/containerization` |
 | 2 — CI/CD | ✅ done | `feat/cicd` |
-| 3 — Terraform | not started | `feat/terraform` |
+| 3 — Terraform | ✅ done | `feat/terraform` |
 | 4 — Kubernetes | not started | `feat/k8s` |
 | 5 — GitOps + Observability | not started | `feat/observability` |
 

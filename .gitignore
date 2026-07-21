@@ -35,6 +35,11 @@ out/
 crash.log
 crash.*.log
 
+# NOTE: .terraform.lock.hcl above is gitignored for this single-operator repo.
+# Per Hashicorp's guidance it should normally be committed, but since there's
+# only one operator and we want `terraform init` to always pull fresh hashes,
+# leaving it ignored is the lower-friction choice. Re-enable if collaborators join.
+
 # Kubernetes
 kubeconfig*
 *.kube
